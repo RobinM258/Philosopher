@@ -6,23 +6,27 @@
 /*   By: robin <robin@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/02 15:07:30 by romartin          #+#    #+#             */
-/*   Updated: 2023/07/20 10:06:54 by robin            ###   ########.fr       */
+/*   Updated: 2023/07/21 10:31:10 by robin            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 #include <unistd.h>
 
-/*void ft_break(t_list *list, t_philo *philo)
+void ft_break(t_list *list, t_philo *philo)
 {
 	int	i;
 
 	i = 0;
-	while (++i <= list->nb_philo)
-		pthread_join(philo[i] NULL);
+	//while (++i <= list->nb_philo)
+		//pthread_join(philo[i].id NULL);
 	i = 0;
-	while 
-}*/
+	while (++i <list->nb_philo)
+		pthread_mutex_destroy(&list->fork[i]);
+	pthread_mutex_unlock(&(list->writing));
+	pthread_mutex_destroy(&(list->writing));
+	pthread_mutex_destroy(&list->check_meal);
+}
 
 int full_digit(char **argv, int len)
 {
@@ -68,7 +72,10 @@ void ft_time_to_eat(long long time)
 
 void ft_print(t_philo *philo, char *str)
 {
-	printf("%d %s\n", philo->id, str);
+	if (philo->list->died != 1)
+	{
+		printf("%lli %d %s\n",(timestamp() - philo->list->start), philo->id, str);
+	}
 }
 
 void init_mutex(t_list *list)
@@ -162,19 +169,13 @@ void time_to_sleep(t_philo *phil)
 void *philo_life(void *void_philo)
 {
 	t_philo	*phil;
-	//t_list *list;
+	t_list	*list;
 
 	phil = (t_philo *)void_philo;
-	//list = phil->list;
-	//int i;
-
-	//i = 0;
+	list = phil->list;
 	if (phil->id  % 2 == 0)
-	{
-		printf("thread %d\n", phil->id);
 		usleep(300);
-	}
-	while(1)
+	while(list->died != 1)
 	{
 		eat(phil);
 		pthread_mutex_lock(&(phil->list->writing));
@@ -185,7 +186,7 @@ void *philo_life(void *void_philo)
 		ft_print(phil, " is thinking\n");
 		pthread_mutex_unlock(&(phil->list->writing));
 	}
-	pthread_exit(NULL);
+	//pthread_exit(NULL);
 	return(0);
 }
 
@@ -210,12 +211,14 @@ void create_thread(t_list *list)
 	int i;
 
 	i = 0;
+	list->start = timestamp();
 	while(i < list->nb_philo)
 	{
 		pthread_create(&list->philo[i].ph, NULL, philo_life, &list->philo[i]);
 		i++;
 	}
 	is_dead(list, list->philo);
+	ft_break(list, list->philo);
 }
 
 void Error(t_list *list, char **av)
