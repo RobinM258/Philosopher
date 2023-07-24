@@ -3,14 +3,35 @@
 /*                                                        :::      ::::::::   */
 /*   ft_atoi.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: robin <robin@student.42.fr>                +#+  +:+       +#+        */
+/*   By: romartin <romartin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/16 09:43:26 by romartin          #+#    #+#             */
-/*   Updated: 2023/07/19 10:08:26 by robin            ###   ########.fr       */
+/*   Updated: 2023/07/24 16:53:54 by romartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h" 
+
+int	full_digit(char **argv, int len)
+{
+	int	i;
+	int	a;
+
+	i = 1;
+	a = 0;
+	while (i <= len)
+	{
+		a = 0;
+		while (argv[i][a])
+		{
+			if ((argv[i][a] < '0' || argv[i][a] > '9'))
+				return (1);
+			a++;
+		}
+		i++;
+	}
+	return (0);
+}
 
 static int	ft_white(const char *str)
 {

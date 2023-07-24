@@ -6,14 +6,14 @@
 #    By: romartin <romartin@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/06/02 15:07:15 by romartin          #+#    #+#              #
-#    Updated: 2023/06/02 15:55:48 by romartin         ###   ########.fr        #
+#    Updated: 2023/07/24 17:23:27 by romartin         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = philosophers
 
-SRCS = main.c ft_atoi.c 
-FLAG    = -Wall -Werror -Wextra
+SRCS = main.c ft_atoi.c philo_life.c utils.c init.c
+FLAG    = -Wall -Werror -Wextra -fsanitize=thread -g
 OBJS	=  ${SRCS:.c=.o}
 
 .c.o	:
