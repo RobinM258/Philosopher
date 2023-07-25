@@ -6,7 +6,7 @@
 /*   By: romartin <romartin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/24 15:38:30 by romartin          #+#    #+#             */
-/*   Updated: 2023/07/24 16:53:23 by romartin         ###   ########.fr       */
+/*   Updated: 2023/07/25 14:14:01 by romartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ void	create_thread(t_list *list)
 	int	i;
 
 	i = 0;
-	list->start = timestamp();
+	list->start = get_time(list);
 	while (i < list->nb_philo)
 	{
 		pthread_create(&list->philo[i].ph, NULL, philo_life, &list->philo[i]);
@@ -34,7 +34,7 @@ void	init_philo(t_list *list)
 	i = list->nb_philo;
 	while (--i >= 0)
 	{
-		list->philo[i].last_meal = timestamp();
+		list->philo[i].last_meal = get_time(list);
 		list->philo[i].id = i + 1;
 		list->philo[i].left_fork = i;
 		list->philo[i].nb_meal = 0;
@@ -70,4 +70,5 @@ void	init_mutex(t_list *list)
 		pthread_mutex_init(&list->fork[i], NULL);
 	pthread_mutex_init(&list->writing, NULL);
 	pthread_mutex_init(&list->die, NULL);
+	pthread_mutex_init(&list->m_time, NULL);
 }

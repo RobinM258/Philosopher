@@ -6,11 +6,18 @@
 /*   By: romartin <romartin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/16 09:43:26 by romartin          #+#    #+#             */
-/*   Updated: 2023/07/24 16:53:54 by romartin         ###   ########.fr       */
+/*   Updated: 2023/07/25 14:51:32 by romartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h" 
+
+void	ft_print(t_philo *philo, char *str)
+{
+	if (philo->list->died != 1)
+		printf("%lli %d %s", (get_time(philo->list)
+				- philo->list->start), philo->id, str);
+}
 
 int	full_digit(char **argv, int len)
 {

@@ -6,7 +6,7 @@
 /*   By: romartin <romartin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/01 10:37:28 by robin             #+#    #+#             */
-/*   Updated: 2023/07/24 17:33:21 by romartin         ###   ########.fr       */
+/*   Updated: 2023/07/24 19:57:53 by romartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,11 +41,14 @@ typedef struct s_list
 	int					died;
 	int					meal;
 	long long			start;
+	long long			time;
 	t_philo				philo[250];
 	pthread_mutex_t		fork[250];
 	pthread_mutex_t		writing;
 	pthread_mutex_t		die;
 	pthread_mutex_t		check_meal;
+	pthread_mutex_t		m_time;
+	pthread_t			thread_time;
 }	t_list;
 
 int			ft_atoi(const char *str);
@@ -56,9 +59,10 @@ void		*philo_life(void *void_philo);
 void		time_to_sleep(t_philo *phil);
 void		check_die(t_list *list);
 void		ft_print(t_philo *philo, char *str);
-long long	timestamp(void);
+void		*timestamp(void *param);
+long long	get_time(t_list *list);
 void		ft_break(t_list *list);
-void		ft_time_to_eat(long long time);
+void		ft_time_to_eat(long long time, t_list *list);
 void		atribution_four(t_list *list, char **av);
 void		atribution_five(t_list *list, char **av);
 void		init_philo(t_list *list);

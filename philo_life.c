@@ -6,7 +6,7 @@
 /*   By: romartin <romartin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/24 15:29:48 by romartin          #+#    #+#             */
-/*   Updated: 2023/07/24 18:09:51 by romartin         ###   ########.fr       */
+/*   Updated: 2023/07/25 14:58:04 by romartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ void	eat2(t_philo *phil)
 	t_list	*list;
 
 	list = phil->list;
-	ft_time_to_eat(list->time_to_eat);
+	ft_time_to_eat(list->time_to_eat, list);
 	pthread_mutex_unlock(&list->fork[phil->left_fork]);
 	pthread_mutex_unlock(&list->fork[phil->right_fork]);
 }
@@ -28,17 +28,17 @@ void	eat(t_philo *phil)
 
 	list = phil->list;
 	pthread_mutex_lock(&list->fork[phil->left_fork]);
-	check_die(list);
 	pthread_mutex_lock(&(list->writing));
+	check_die(list);
 	ft_print(phil, "has taken a fork\n");
 	pthread_mutex_unlock(&(list->writing));
 	pthread_mutex_lock(&list->fork[phil->right_fork]);
-	check_die(list);
 	pthread_mutex_lock(&(list->writing));
+	check_die(list);
 	ft_print(phil, "has taken a fork\n");
 	pthread_mutex_unlock(&(list->writing));
-	check_die(list);
 	pthread_mutex_lock(&(list->writing));
+	check_die(list);
 	ft_print(phil, "is eating\n");
 	pthread_mutex_unlock(&(list->writing));
 	if (phil->list->time_to_eat != -1)
@@ -46,7 +46,7 @@ void	eat(t_philo *phil)
 	pthread_mutex_lock(&list->check_meal);
 	if (phil->nb_meal == list->nb_of_meal)
 		list->all_eat++;
-	phil->last_meal = timestamp();
+	phil->last_meal = get_time(list);
 	pthread_mutex_unlock(&list->check_meal);
 	eat2(phil);
 }
@@ -65,10 +65,12 @@ void	*philo_life(void *void_philo)
 	{
 		eat(phil);
 		pthread_mutex_lock(&(phil->list->writing));
+		check_die(list);
 		ft_print(phil, "is sleeping\n");
 		pthread_mutex_unlock(&(phil->list->writing));
 		time_to_sleep(phil);
 		pthread_mutex_lock(&(phil->list->writing));
+		check_die(list);
 		ft_print(phil, "is thinking\n");
 		pthread_mutex_unlock(&(phil->list->writing));
 	}
@@ -79,12 +81,12 @@ void	time_to_sleep(t_philo *phil)
 {
 	long long	past;
 
-	past = timestamp();
+	past = get_time(phil->list);
 	while (1)
 	{
-		if (timestamp() - past >= phil->list->time_to_sleep)
+		if (get_time(phil->list) - past >= phil->list->time_to_sleep)
 			break ;
-		usleep(phil->list->time_to_sleep / 10);
+		usleep(500);
 	}
 }
 

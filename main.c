@@ -6,13 +6,13 @@
 /*   By: romartin <romartin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/02 15:07:30 by romartin          #+#    #+#             */
-/*   Updated: 2023/07/24 17:39:35 by romartin         ###   ########.fr       */
+/*   Updated: 2023/07/25 15:09:01 by romartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-int	check_death(t_philo *ph, long long i)
+int	check_death_time(t_philo *ph, long long i)
 {
 	if (i >= ph->list->time_to_die)
 		return (1);
@@ -29,7 +29,7 @@ void	is_dead(t_list *list, t_philo *philo)
 	{
 		if (i >= list->nb_philo)
 			i = 0;
-		time = timestamp();
+		time = get_time(list);
 		if (time - philo[i].last_meal > list->time_to_die)
 		{
 			pthread_mutex_lock(&(list->die));
@@ -42,21 +42,21 @@ void	is_dead(t_list *list, t_philo *philo)
 		if (list->died == 1)
 			break ;
 		i++;
-		usleep(100);
+		usleep(500);
 	}
 }
 
 void	error(t_list *list, char **av)
 {
-	if (list->nb_philo == 0 || list->time_to_die == 0
-		|| list->time_to_eat == 0 || list->time_to_sleep == 0)
+	if (list->nb_philo <= 0 || list->time_to_die <= 0
+		|| list->time_to_eat <= 0 || list->time_to_sleep <= 0)
 	{
-		printf("Error\n");
+		write(2, "Error\n", 6);
 		exit(EXIT_FAILURE);
 	}
 	if (av[5] && list->nb_of_meal == 0)
 	{
-		printf("Error\n");
+		write(2, "Error\n", 6);
 		exit(EXIT_FAILURE);
 	}
 }
@@ -67,7 +67,7 @@ int	func(int ac, char **av, t_list *list)
 	{
 		if (full_digit(av, 4) == 1)
 		{
-			printf("Error argument\n");
+			write(2, "Error\n", 6);
 			free(list);
 			return (0);
 		}
@@ -78,7 +78,7 @@ int	func(int ac, char **av, t_list *list)
 		if (full_digit(av, 5) == 1)
 		{
 			free(list);
-			printf("Error argument\n");
+			write(2, "Error\n", 6);
 			return (0);
 		}
 		atribution_five(list, av);
@@ -98,6 +98,10 @@ int	main(int ac, char **av)
 	if (func(ac, av, list) == 0)
 		return (0);
 	error(list, av);
+	pthread_create(&(list->thread_time), NULL, timestamp, list);
+	pthread_detach(list->thread_time);
+	while (!get_time(list))
+		;
 	init_philo(list);
 	init_mutex(list);
 	create_thread(list);

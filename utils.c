@@ -6,7 +6,7 @@
 /*   By: romartin <romartin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/24 15:46:42 by romartin          #+#    #+#             */
-/*   Updated: 2023/07/24 18:12:28 by romartin         ###   ########.fr       */
+/*   Updated: 2023/07/25 14:45:43 by romartin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,30 +24,50 @@ void	ft_break(t_list *list)
 	pthread_mutex_destroy(&list->check_meal);
 }
 
-long long	timestamp(void)
+int	check_death(t_list *list)
 {
-	struct timeval	t;
-
-	gettimeofday(&t, NULL);
-	return ((t.tv_sec * 1000) + (t.tv_usec / 1000));
+	pthread_mutex_lock(&(list->die));
+	if (list->died)
+	{
+		pthread_mutex_unlock(&(list->die));
+		return (1);
+	}
+	pthread_mutex_unlock(&(list->die));
+	return (0);
 }
 
-void	ft_time_to_eat(long long time)
+void	*timestamp(void *param)
+{
+	t_list			*list;
+	struct timeval	t;
+
+	list = (t_list *)param;
+	while (1)
+	{
+		gettimeofday(&t, NULL);
+		pthread_mutex_lock(&(list->m_time));
+		list->time = (t.tv_sec * 1000) + (t.tv_usec / 1000);
+		pthread_mutex_unlock(&(list->m_time));
+		usleep(500);
+	}
+	return (NULL);
+}
+
+long long	get_time(t_list *list)
+{
+	long long	ret;
+
+	pthread_mutex_lock(&(list->m_time));
+	ret = list->time;
+	pthread_mutex_unlock(&(list->m_time));
+	return (ret);
+}
+
+void	ft_time_to_eat(long long time, t_list *list)
 {
 	long long	past;
 
-	past = timestamp();
-	while (1)
-	{
-		if (timestamp() - past >= time)
-			break ;
-		usleep(time / 10);
-	}
-}
-
-void	ft_print(t_philo *philo, char *str)
-{
-	if (philo->list->died != 1)
-		printf("%lli %d %s", (timestamp()
-				- philo->list->start), philo->id, str);
+	past = get_time(list);
+	while (get_time(list) - past < time)
+		usleep(500);
 }
